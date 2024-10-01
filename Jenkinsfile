@@ -1,10 +1,8 @@
-@Library("Shared") _
+@Library("shared") _
 pipeline{
-    
-    agent { label "vinod"}
+    agent {label "agent-jenkins"}
     
     stages{
-        
         stage("Hello"){
             steps{
                 script{
@@ -14,30 +12,36 @@ pipeline{
         }
         stage("Code"){
             steps{
-               script{
-                clone("https://github.com/LondheShubham153/django-notes-app.git","main")
-               }
-                
+                script{
+                    clone('https://github.com/mimqupspy/django-notes-app.git','main')
+                    echo "Clone Sucessfully"
+                }
             }
         }
         stage("Build"){
             steps{
-                script{
-                docker_build("notes-app","latest","trainwithshubham")
-                }
+               script{
+                   docker_build("noteapp","latest","internaldev")
+               }
             }
         }
-        stage("Push to DockerHub"){
+        
+        stage("Test"){
             steps{
-                script{
-                    docker_push("notes-app","latest","trainwithshubham")
-                }
+                echo "This is test the code"
+            }
+        }
+        stage("Push to Docker Hub"){
+            steps{
+             script{
+                 docker_push("noteapp","latest","internaldev")
+             }
             }
         }
         stage("Deploy"){
             steps{
-                echo "This is deploying the code"
-                sh "docker compose down && docker compose up -d"
+                echo "this is deploy the code"
+                sh "docker compose up -d"
             }
         }
     }
